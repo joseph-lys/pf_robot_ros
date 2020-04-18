@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>pf_interface_board</name>
+  <name>ros_interface_gui</name>
   <version>0.1.0</version>
   <description>A template for ROS packages.</description>
   <maintainer email="joseph.lys@gmail.com">Joseph Lee Yuan Sheng</maintainer>
