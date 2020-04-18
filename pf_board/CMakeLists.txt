@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(pf_interface_board)
+project(pf_board)
 
 ## Use C++14
 add_definitions(-std=c++14)
@@ -12,6 +12,8 @@ find_package(catkin REQUIRED
   COMPONENTS
     roscpp
     sensor_msgs
+    roslint
+    pf_msgs
 )
 
 ## Find system libraries
@@ -36,9 +38,13 @@ catkin_package(
   CATKIN_DEPENDS
     roscpp
     sensor_msgs
+    pf_msgs
 #  DEPENDS
 #    Boost
 )
+
+
+
 
 ###########
 ## Build ##
@@ -48,69 +54,55 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
-  board_msgs
   ${catkin_INCLUDE_DIRS}
 #  ${EIGEN3_INCLUDE_DIR}
 #  ${Boost_INCLUDE_DIRS}
 )
 
-## Declare a cpp library
-add_library(${PROJECT_NAME}_core
-   src/MainStateMachine.cpp
-   src/MotorStateMachine.cpp
-   src/CommsHardware.cpp
-   src/MsgMapping.cpp
-)
-
 ## Declare cpp executables
 add_executable(${PROJECT_NAME}
   src/${PROJECT_NAME}_node.cpp
-  src/PFInterfaceBoard.cpp
+  src/pf_board.cpp
+
+  src/fsm/base_classes.cpp
 )
 
 ## Add dependencies to exported targets, like ROS msgs or srvs
-add_dependencies(${PROJECT_NAME}_core
-  ${catkin_EXPORTED_TARGETS}
-)
-
 add_dependencies(${PROJECT_NAME}
   ${catkin_EXPORTED_TARGETS}
 )
 
 ## Specify libraries to link executable targets against
-target_link_libraries(${PROJECT_NAME}_core
+target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
 
-target_link_libraries(${PROJECT_NAME}
-  ${PROJECT_NAME}_core
-  ${catkin_LIBRARIES}
-)
+roslint_cpp()
 
 #############
 ## Install ##
 #############
 
 # Mark executables and/or libraries for installation
-install(
-  TARGETS ${PROJECT_NAME}
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# install(
+#   TARGETS ${PROJECT_NAME}
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 # Mark cpp header files for installation
-install(
-  DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.hpp"
-)
+# install(
+#   DIRECTORY include/${PROJECT_NAME}/
+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+#   FILES_MATCHING PATTERN "*.hpp"
+# )
 
 # Mark other files for installation
-install(
-  DIRECTORY doc
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+# install(
+#   DIRECTORY doc
+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+# )
 
 #############
 ## Testing ##

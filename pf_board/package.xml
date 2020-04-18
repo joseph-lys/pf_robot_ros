@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>ros_interface_gui</name>
+  <name>pf_board</name>
   <version>0.1.0</version>
   <description>A template for ROS packages.</description>
   <maintainer email="joseph.lys@gmail.com">Joseph Lee Yuan Sheng</maintainer>
@@ -14,4 +14,6 @@
   <depend>eigen</depend>
   <depend>roscpp</depend>
   <depend>sensor_msgs</depend>
+  <depend>pf_msgs</depend>
+  <build_depend>roslint</build_depend>
 </package>
