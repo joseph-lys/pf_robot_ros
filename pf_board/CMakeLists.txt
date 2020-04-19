@@ -63,8 +63,8 @@ include_directories(
 add_executable(${PROJECT_NAME}
   src/${PROJECT_NAME}_node.cpp
   src/pf_board.cpp
-
   src/fsm/base_classes.cpp
+  src/fsm/defined_states.cpp
 )
 
 ## Add dependencies to exported targets, like ROS msgs or srvs

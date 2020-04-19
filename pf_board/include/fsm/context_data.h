@@ -80,7 +80,7 @@ struct MotorFeedbackData {
   unsigned long long last_reading_us = 0;
 };
 
-struct ContextData : public fsm::BaseContext
+struct ContextData : public pf_board::fsm::BaseContext
 {
   std::map<uint8_t, uint16_t> motor_id_mapping;
   std::map<uint8_t, MotorFeedbackData> motor_feedback_data;
