@@ -52,6 +52,7 @@ add_message_files(
   FILES
   MotorState.msg
   MotorStateArray.msg
+  InputState.msg
 )
 
 ## Generate services in the 'srv' folder

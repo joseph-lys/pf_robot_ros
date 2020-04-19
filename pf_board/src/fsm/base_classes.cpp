@@ -1,60 +1,60 @@
 /// Copyright 2020 Joseph Lee Yuan Sheng
 ///
-
 #include "ros/ros.h"
 #include "fsm/base_classes.h"
 
 using pf_board::fsm::AbstractState;
+using pf_board::fsm::BaseStateDecorator;
 
-using pf_board::fsm::BaseCompositeState;
 
-AbstractState* BaseCompositeState::serviceCheckIOWrite(bool& service_available)
+AbstractState* BaseStateDecorator::serviceCheckIOWrite(bool& service_available)
 {
   return nullptr;
 }
-AbstractState* BaseCompositeState::serviceCheckIORead(bool& service_available)
+AbstractState* BaseStateDecorator::serviceCheckIORead(bool& service_available)
 {
   return nullptr;
 }
-AbstractState* BaseCompositeState::serviceCheckMotor(bool& service_available)
+AbstractState* BaseStateDecorator::serviceCheckMotor(bool& service_available)
 {
   return nullptr;
 }
-AbstractState* BaseCompositeState::receiveFromRos(BaseContext& internal_state, BaseContext& data_from_ros)
+AbstractState* BaseStateDecorator::receiveFromRos(StateData& internal_state, DataFromRos& data_from_ros)
 {
   return nullptr;
 }
-AbstractState* BaseCompositeState::noReceiveFromRos(BaseContext& internal_state)
+AbstractState* BaseStateDecorator::noReceiveFromRos(StateData& internal_state)
 {
   return nullptr;
 }
-AbstractState* BaseCompositeState::sendToBoard(BaseContext& internal_state, BaseContext& data_to_board)
+AbstractState* BaseStateDecorator::sendToBoard(StateData& internal_state, DataToBoard& data_to_board)
 {
   return nullptr;
 }
-AbstractState* BaseCompositeState::receiveFromBoard(BaseContext& internal_state, BaseContext& data_to_board)
+AbstractState* BaseStateDecorator::receiveFromBoard(StateData& internal_state, DataFromBoard& data_to_board)
 {
   return nullptr;
 }
-AbstractState* BaseCompositeState::noReceiveFromBoard(BaseContext& internal_state)
+AbstractState* BaseStateDecorator::noReceiveFromBoard(StateData& internal_state)
 {
   return nullptr;
 }
-AbstractState* BaseCompositeState::sendToRos(BaseContext& internal_state, BaseContext& data_to_board)
+AbstractState* BaseStateDecorator::sendToRos(StateData& internal_state, DataToRos& data_to_board)
 {
   return nullptr;
 }
-AbstractState* BaseCompositeState::nextState(BaseContext& internal_state)
+AbstractState* BaseStateDecorator::nextState(StateData& internal_state)
 {
   return nullptr;
 }
-void BaseCompositeState::onEntry()
+void BaseStateDecorator::onEntry()
 {
 }
 
-using pf_board::fsm::BaseComponentState;
-AbstractState* BaseComponentState::serviceCheckIOWrite(bool& service_available)
+using pf_board::fsm::BaseStatePrototype;
+AbstractState* BaseStatePrototype::serviceCheckIOWrite(bool& service_available)
 {
+  service_available = false;
   AbstractState* next_state = nullptr;
   for(auto composite : composites_)
   {
@@ -73,8 +73,9 @@ AbstractState* BaseComponentState::serviceCheckIOWrite(bool& service_available)
   }
   return next_state;
 }
-AbstractState* BaseComponentState::serviceCheckIORead(bool& service_available)
+AbstractState* BaseStatePrototype::serviceCheckIORead(bool& service_available)
 {
+  service_available = false;
   AbstractState* next_state = nullptr;
   for(auto composite : composites_)
   {
@@ -93,8 +94,9 @@ AbstractState* BaseComponentState::serviceCheckIORead(bool& service_available)
   }
   return next_state;
 }
-AbstractState* BaseComponentState::serviceCheckMotor(bool& service_available)
+AbstractState* BaseStatePrototype::serviceCheckMotor(bool& service_available)
 {
+  service_available = false;
   AbstractState* next_state = nullptr;
   for(auto composite : composites_)
   {
@@ -113,7 +115,7 @@ AbstractState* BaseComponentState::serviceCheckMotor(bool& service_available)
   }
   return next_state;
 }
-AbstractState* BaseComponentState::receiveFromRos(BaseContext& internal_state, BaseContext& data_from_ros)
+AbstractState* BaseStatePrototype::receiveFromRos(StateData& internal_state, DataFromRos& data_from_ros)
 {
   AbstractState* next_state = nullptr;
   for(auto composite : composites_)
@@ -133,7 +135,7 @@ AbstractState* BaseComponentState::receiveFromRos(BaseContext& internal_state, B
   }
   return next_state;
 }
-AbstractState* BaseComponentState::noReceiveFromRos(BaseContext& internal_state)
+AbstractState* BaseStatePrototype::noReceiveFromRos(StateData& internal_state)
 {
   AbstractState* next_state = nullptr;
   for(auto composite : composites_)
@@ -153,7 +155,7 @@ AbstractState* BaseComponentState::noReceiveFromRos(BaseContext& internal_state)
   }
   return next_state;
 }
-AbstractState* BaseComponentState::sendToBoard(BaseContext& internal_state, BaseContext& data_to_board)
+AbstractState* BaseStatePrototype::sendToBoard(StateData& internal_state, DataToBoard& data_to_board)
 {
   AbstractState* next_state = nullptr;
   for(auto composite : composites_)
@@ -173,7 +175,7 @@ AbstractState* BaseComponentState::sendToBoard(BaseContext& internal_state, Base
   }
   return next_state;
 }
-AbstractState* BaseComponentState::receiveFromBoard(BaseContext& internal_state, BaseContext& data_from_board)
+AbstractState* BaseStatePrototype::receiveFromBoard(StateData& internal_state, DataFromBoard& data_from_board)
 {
   AbstractState* next_state = nullptr;
   for(auto composite : composites_)
@@ -192,7 +194,7 @@ AbstractState* BaseComponentState::receiveFromBoard(BaseContext& internal_state,
     next_state = basePtr();
   }
 }
-AbstractState* BaseComponentState::noReceiveFromBoard(BaseContext& internal_state)
+AbstractState* BaseStatePrototype::noReceiveFromBoard(StateData& internal_state)
 {
   AbstractState* next_state = nullptr;
   for(auto composite : composites_)
@@ -211,7 +213,7 @@ AbstractState* BaseComponentState::noReceiveFromBoard(BaseContext& internal_stat
     next_state = basePtr();
   }
 }
-AbstractState* BaseComponentState::sendToRos(BaseContext& internal_state, BaseContext& data_to_ros)
+AbstractState* BaseStatePrototype::sendToRos(StateData& internal_state, DataToRos& data_to_ros)
 {
   AbstractState* next_state = nullptr;
   for(auto composite : composites_)
@@ -230,7 +232,7 @@ AbstractState* BaseComponentState::sendToRos(BaseContext& internal_state, BaseCo
     next_state = basePtr();
   }
 }
-AbstractState* BaseComponentState::nextState(BaseContext& internal_state)
+AbstractState* BaseStatePrototype::nextState(StateData& internal_state)
 {
   AbstractState* next_state = nullptr;
   for(auto composite : composites_)
@@ -250,12 +252,12 @@ AbstractState* BaseComponentState::nextState(BaseContext& internal_state)
   }
 }
 
-BaseComponentState::BaseComponentState()
+BaseStatePrototype::BaseStatePrototype()
 {
 
 }
 
-void BaseComponentState::onEntry()
+void BaseStatePrototype::onEntry()
 {
   for(auto composite : composites_)
   {

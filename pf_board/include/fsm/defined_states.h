@@ -9,6 +9,10 @@ namespace pf_board
 {
 namespace fsm
 {
+namespace states
+{
+
+
 
 /// Idle State for initialization
 class IdleState : public BaseState <IdleState>
@@ -60,6 +64,7 @@ class ErrorState : public BaseState <ErrorState>
 
 
 
+}  // namespace states
 }  // namespace fsm
 }  // namesapce pf_board
 #endif  // FSM_DEFINED_STATES_H

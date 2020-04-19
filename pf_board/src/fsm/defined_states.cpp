@@ -2,28 +2,40 @@
 ///
 
 #include "fsm/defined_states.h"
+#include "fsm/state_decorators_motors.h"
+#include "fsm/state_decorators_ios.h"
+#include "fsm/state_decorators_events.h"
+using namespace pf_board::fsm::states;
+using namespace pf_board::fsm::state_decorators_motors;
+using namespace pf_board::fsm::state_decorators_ios;
+using namespace pf_board::fsm::state_decorators_events;
 
-pf_board::fsm::IdleState::IdleState()
+IdleState::IdleState()
 {
 
 }
-pf_board::fsm::ConfigState::ConfigState()
+
+ConfigState::ConfigState()
 {
   
 }
-pf_board::fsm::PreloadState::PreloadState()
+
+PreloadState::PreloadState()
 {
   
 }
-pf_board::fsm::RunState::RunState()
+
+RunState::RunState()
 {
   
 }
-pf_board::fsm::StopState::StopState()
+
+StopState::StopState()
 {
   
 }
-pf_board::fsm::ErrorState::ErrorState()
+
+ErrorState::ErrorState()
 {
   
 }
