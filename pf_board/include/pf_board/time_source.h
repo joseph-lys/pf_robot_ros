@@ -3,7 +3,7 @@
 /// time source singleton
 /// provides an adapter ros time implementation
 /// so that underlying implementation can be swapped to a mock time source for testing
-
+#ifndef PF_BOARD_TIME_SOURCE_H
 #define PF_BOARD_TIME_SOURCE_H
 
 #include <vector>
@@ -15,13 +15,12 @@ class TimeSource
 {
  public:
   static ros::Time now();
-  static void setNow(const Time& new_now);
+  static void setNow(const ros::Time& new_now);
   static void setStamp();  // store a timestamp that can be reused later
   static ros::Time getStamp(); // retrieve the last timestamp
 
-  Timesource() = delete;
  private:
-  static ros::Time stamp_{0};
+  static ros::Time stamp_;
 }; 
 
 

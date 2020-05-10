@@ -1,7 +1,7 @@
 /// Copyright 2020 Joseph Lee Yuan Sheng
 ///
 
-#include "./pf_board.h"
+#include "pf_board/pf_board.h"
 #include <string>
 
 using pf_board::PfBoard;

@@ -1,5 +1,7 @@
-#include "time_source/time_source.h"
+#include "pf_board/time_source.h"
 
+
+using pf_board::TimeSource;
 
 
 ros::Time TimeSource::now()
@@ -7,7 +9,7 @@ ros::Time TimeSource::now()
   return ros::Time::now();
 }
 
-void TimeSource::setNow(const Time& new_now)
+void TimeSource::setNow(const ros::Time& new_now)
 {
   ros::Time::setNow(new_now);
 }

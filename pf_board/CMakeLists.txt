@@ -59,12 +59,14 @@ include_directories(
 #  ${Boost_INCLUDE_DIRS}
 )
 
+file(GLOB PF_BOARD_SRC_CPP
+    "src/*.cpp"
+    "src/*/*.cpp"
+)
+
 ## Declare cpp executables
 add_executable(${PROJECT_NAME}
-  src/${PROJECT_NAME}_node.cpp
-  src/pf_board.cpp
-  src/fsm/base_classes.cpp
-  src/fsm/defined_states.cpp
+  ${PF_BOARD_SRC_CPP}
 )
 
 ## Add dependencies to exported targets, like ROS msgs or srvs
