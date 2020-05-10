@@ -1,3 +1,0 @@
-[submodule "sub_modules/vstruct"]
-	path = sub_modules/vstruct
-	url = https://github.com/joseph-lys/vstruct.git
