@@ -1,0 +1,21 @@
+@startuml
+
+state Sequence {
+  [*] --> Idle
+  Idle --> Wait : time based transition
+  Wait --> Sync : time based transition
+  Sync --> Run :  time based transition
+
+
+  AutoEnable --> Error : hasMotorErrors
+  Run --> Error : hasMotorErrors
+
+  Error --> Run : hasNoErrors
+
+  AutoEnable --> NonRecoverable : hasNonRecoverableErrors
+  Run --> NonRecoverable : hasNonRecoverableErrors
+
+}
+
+
+@enduml

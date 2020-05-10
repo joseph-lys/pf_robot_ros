@@ -1,14 +1,11 @@
 /// Copyright 2020 Joseph Lee Yuan Sheng
 ///
 
-#ifndef FSM_CONFIGURATION_H
-#define FSM_CONFIGURATION_H
+#ifndef PF_BOARD_CONFIGURATION_H
+#define PF_BOARD_CONFIGURATION_H
 
 namespace pf_board
 {
-namespace fsm
-{
-
 /// Configuration Constants
 enum ConfigurationConstants: uint8_t 
 {
@@ -20,7 +17,6 @@ enum ConfigurationConstants: uint8_t
 };
 
 
-}  // namespace fsm 
 }  // namespace pf_board
 
-#endif  // FSM_CONFIGURATION_H
+#endif  // PF_BOARD_CONFIGURATION_H

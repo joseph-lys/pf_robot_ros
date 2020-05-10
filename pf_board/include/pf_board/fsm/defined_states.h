@@ -1,15 +1,15 @@
 /// Copyright 2020 Joseph Lee Yuan Sheng
 ///
 
-#ifndef FSM_DEFINED_STATES_H
-#define FSM_DEFINED_STATES_H
+#ifndef PF_BOARD_FSM_DEFINED_STATES_H
+#define PF_BOARD_FSM_DEFINED_STATES_H
 
-#include "fsm/base_classes.h"
+#include "pf_board/fsm/base_state.h"
 namespace pf_board
 {
 namespace fsm
 {
-namespace states
+namespace defined_states
 {
 
 
@@ -64,7 +64,7 @@ class ErrorState : public BaseState <ErrorState>
 
 
 
-}  // namespace states
+}  // namespace defined_states
 }  // namespace fsm
 }  // namesapce pf_board
-#endif  // FSM_DEFINED_STATES_H
+#endif  // PF_BOARD_FSM_DEFINED_STATES_H
