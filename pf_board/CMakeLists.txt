@@ -59,15 +59,24 @@ include_directories(
 #  ${Boost_INCLUDE_DIRS}
 )
 
-file(GLOB PF_BOARD_SRC_CPP
-    "src/*.cpp"
-    "src/*/*.cpp"
-)
-
 ## Declare cpp executables
 add_executable(${PROJECT_NAME}
-  ${PF_BOARD_SRC_CPP}
+  src/pf_board/comms/spi_driver.cpp
+  src/pf_board/comms/transport_layer.cpp
+  src/pf_board/states/sync_state.cpp
+  src/pf_board/states/stop_state.cpp
+  src/pf_board/states/wait_state.cpp
+  src/pf_board/states/error_state.cpp
+  src/pf_board/states/run_state.cpp
+  src/pf_board/states/non_recoverable_state.cpp
+  src/pf_board/pf_board.cpp
+  src/pf_board/simple_timer.cpp
+  src/pf_board/time_source.cpp
+  src/pf_board_node.cpp
 )
+## cmd to find
+## >find src/ -type f -name "*.cpp"
+
 
 ## Add dependencies to exported targets, like ROS msgs or srvs
 add_dependencies(${PROJECT_NAME}

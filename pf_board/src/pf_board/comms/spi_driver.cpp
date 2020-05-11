@@ -1,14 +1,14 @@
 /// Copyright 2020 Joseph Lee Yuan Sheng
 ///
-#include "pf_board/comms/spi_driver.h"
-
-#include <string.h>
-
+#include <sys/stat.h>
 #include <fcntl.h>
-#include <stdexcept>
+#include <unistd.h>
 #include <linux/spi/spidev.h>
 #include <sys/ioctl.h>
+#include <string.h>
+#include <stdexcept>
 
+#include "pf_board/comms/spi_driver.h"
 
 using pf_board::comms::SpiDriver;
 
@@ -21,11 +21,11 @@ bool SpiDriver::setMode(uint32_t mode)
 {
   bool success = false;
   __u32 spi_mode;
-  if (fd == 0 )
+  if (fd_ == 0 )
   {
     openFd();
   }
-  if (fd > 0)
+  if (fd_ > 0)
   {
     switch (mode) {
       case 0:
@@ -43,7 +43,7 @@ bool SpiDriver::setMode(uint32_t mode)
       default:
         throw std::invalid_argument("SPI invalid mode argument");
     }
-    success = ioctl(fd, SPI_IOC_WR_MODE32, &spi_mode) >= 0;
+    success = ioctl(fd_, SPI_IOC_WR_MODE32, &spi_mode) >= 0;
     if (!keep_open_)
     {
       closeFd();
@@ -56,13 +56,13 @@ bool SpiDriver::setClockFrequency(uint32_t freq_hz)
 {
   bool success = false;
   __u32 spd = static_cast<__u32>(freq_hz);
-  if (fd == 0 )
+  if (fd_ == 0 )
   {
     openFd();
   }
-  if (fd > 0)
+  if (fd_ > 0)
   {
-    success = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &spd) >= 0;
+    success = ioctl(fd_, SPI_IOC_WR_MAX_SPEED_HZ, &spd) >= 0;
     if (!keep_open_)
     {
       closeFd();
@@ -76,6 +76,7 @@ bool SpiDriver::setClockFrequency(uint32_t freq_hz)
 }
 
 void SpiDriver::setKeepOpen(bool keep_open)
+{
   keep_open_ = keep_open;
 }
 
@@ -84,15 +85,14 @@ void SpiDriver::setDeviceName(std::string dev)
   dev_ = dev;
 }
 
-bool SpiDriver::transfer(uint8_t* tx_buffer, uint8_t* rx_buffer, uint32_t length);
+bool SpiDriver::transfer(uint8_t* tx_buffer, uint8_t* rx_buffer, uint32_t length)
 {
   bool success = false;
-  __u32 spd = static_cast<__u32>(freq_hz);
-  if (fd == 0 )
+  if (fd_ == 0 )
   {
     openFd();
   }
-  if (fd > 0)
+  if (fd_ > 0)
   {
     struct spi_ioc_transfer xfer;
     memset(&xfer, 0, sizeof xfer);
@@ -110,14 +110,14 @@ bool SpiDriver::transfer(uint8_t* tx_buffer, uint8_t* rx_buffer, uint32_t length
   return success;
 }
 
-void SpiDriver::openFd()
+bool SpiDriver::openFd()
 {
   if (dev_.length()) {
     fd_ = open(dev_.c_str(), O_RDWR);
   }
 }
 
-void SpiDriver::closeFd()
+bool SpiDriver::closeFd()
 {
   if (fd_) {
     close(fd_);

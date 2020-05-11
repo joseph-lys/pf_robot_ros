@@ -18,9 +18,6 @@ class TimeSource
   static void setNow(const ros::Time& new_now);
   static void setStamp();  // store a timestamp that can be reused later
   static ros::Time getStamp(); // retrieve the last timestamp
-
- private:
-  static ros::Time stamp_;
 }; 
 
 

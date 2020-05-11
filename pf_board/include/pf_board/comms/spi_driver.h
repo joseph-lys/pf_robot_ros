@@ -3,6 +3,10 @@
 
 #ifndef PF_BOARD_COMMS_SPI_DRIVER_H_
 #define PF_BOARD_COMMS_SPI_DRIVER_H_
+
+#include <cstdint>
+#include <string>
+
 namespace pf_board {
 namespace comms {
 
@@ -26,13 +30,13 @@ class SpiDriver
 
   /// Set to keep file descriptor open
   /// @param keep_open true: does not close descriptor, false: open and close descriptor every use
-  bool setKeepOpen(bool keep_open)
+  void setKeepOpen(bool keep_open);
 
   /// Set device name
   /// @param dev string of SPI dev, such as "/dev/spidev0.0"
-  bool setDeviceName(std::string dev);
+  void setDeviceName(std::string dev);
 
-  bool transfer(uint8_t* tx_buffer, uint8_t rx_buffer, uint32_t length);
+  bool transfer(uint8_t* tx_buffer, uint8_t* rx_buffer, uint32_t length);
 
  private:
   bool openFd();
@@ -42,7 +46,7 @@ class SpiDriver
   uint32_t delay_us_ = 0;
   uint16_t freq_hz_ = 0;
   int fd_ = 0;
-  std::string = dev_;
+  std::string dev_;
 };
 
 }  // namespace comms

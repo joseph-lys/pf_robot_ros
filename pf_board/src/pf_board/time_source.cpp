@@ -3,6 +3,7 @@
 
 using pf_board::TimeSource;
 
+static ros::Time stamp = ros::Time::now();
 
 ros::Time TimeSource::now()
 {
@@ -16,10 +17,10 @@ void TimeSource::setNow(const ros::Time& new_now)
 
 void TimeSource::setStamp()
 {
-  stamp_ = now();
+  stamp = now();
 }
 
 ros::Time TimeSource::getStamp()
 {
-  return stamp_;
+  return stamp;
 }

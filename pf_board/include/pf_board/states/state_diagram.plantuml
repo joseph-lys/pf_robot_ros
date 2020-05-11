@@ -1,21 +1,33 @@
 @startuml
-
-state Sequence {
-  [*] --> Idle
-  Idle --> Wait : time based transition
-  Wait --> Sync : time based transition
-  Sync --> Run :  time based transition
-
-
-  AutoEnable --> Error : hasMotorErrors
-  Run --> Error : hasMotorErrors
-
-  Error --> Run : hasNoErrors
-
-  AutoEnable --> NonRecoverable : hasNonRecoverableErrors
-  Run --> NonRecoverable : hasNonRecoverableErrors
-
-}
-
+  state Initialization {
+    [*] --> Wait
+    note right
+    Wait for any valid response from
+    the board, Board may be initializing
+    endnote
+    Wait --> Sync : time based transition
+    note right
+    This state gives some time for
+    ROS outputs to align
+    with actual inputs from Board
+    endnote
+  }
+  state Normal {
+    Sync --> Stop : time based transition
+    Stop --> Run :  runMode(start_delay_ms=0)
+    Stop --> AutoEnable :  runMode(start_delay_ms>0)
+    Run --> Stop : stopMode(restart_in_ms=0)
+    Run-->AutoEnable: stopMode(restart_in_ms>0)
+  }
+  state Errors {
+    Stop --> Error : recoverableError()
+    Stop --> NonRecoverable : nonRecoverableError()
+    Run --> Error : recoverableError()
+    Run --> NonRecoverable : nonRecoverableError()
+    AutoEnable --> Error : recoverableError()
+    AutoEnable --> NonRecoverable : nonRecoverableError()
+    Error --> Stop : resetErrors(restart_in_ms==0)
+    Error --> AutoEnable : resetErrors(restart_in_ms>0)
+  }
 
 @enduml
