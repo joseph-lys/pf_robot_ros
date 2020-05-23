@@ -5,10 +5,12 @@
 #include "pf_board/states/run_state.h"
 #include "pf_board/states/error_state.h"
 
+
 using pf_board::states::BaseState;
 using pf_board::states::StopState;
 using pf_board::states::RunState;
 using pf_board::states::ErrorState;
+
 
 StopState::StopState(uint32_t auto_start_ms)
 {
@@ -23,19 +25,26 @@ StopState::StopState(uint32_t auto_start_ms)
   }
 }
 
-BaseState* StopState::executeLoop(IControl* control)
+std::string StopState::getName()
+{
+  return std::string{"StopState"};
+}
+
+BaseState* StopState::executeLoop(IControl* p_control)
 {
   BaseState* next_state = static_cast<BaseState*>(this);
-  if (!control->processDataFromRos())
+  const bool send_position = true;
+  const bool torque_enable = false;
+  if (p_control->processDataFromRos())
   {
     delay_ros_error_.reset();
   }
-  if (control->transferBoard())
+  if (p_control->transferBoard(send_position, torque_enable))
   {
     delay_board_error_.reset();
-    control->processDataFromBoard();
-    control->transferDataToRos();
+    p_control->processDataFromBoard();
   }
+  p_control->transferDataToRos();
 
   if (delay_ros_error_.isTimeout() || delay_board_error_.isTimeout())
   {
@@ -48,22 +57,19 @@ BaseState* StopState::executeLoop(IControl* control)
   return next_state;
 }
 
-void StopState::enterState(IControl* control)
+BaseState* StopState::executeTorqueControl(IControl* p_control, bool torque_enable, uint32_t duration)
+{
+  BaseState* next = static_cast<BaseState*>(this);
+  if (torque_enable)
+  {
+    next = new RunState{duration};
+  }
+  return next;
+}
+
+void StopState::enterState(IControl* p_control)
 {
   delay_auto_transition_.reset();
   delay_board_error_.reset();
   delay_ros_error_.reset();
-
-  control->setSrvIosWrite(true);
-  control->setSrvMotorCommand(true);
-  control->setSrvTorqueControlCommand(true);
-  control->setSrvResetCommand(false);
-  control->setPeriodicControl(true);
-
-  control->setSafeStateIos();
-  control->setTorqueEnabled(false);
-}
-
-void StopState::exitState(IControl* control)
-{
 }

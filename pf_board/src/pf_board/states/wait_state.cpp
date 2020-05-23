@@ -11,25 +11,32 @@ using pf_board::states::IControl;
 
 WaitState::WaitState()
 {
-  delay_ros_error.setMillis(200);  // must receive at least 5 Hz 
-  delay_board_okay.setMillis(100);  // must receive at least 10 Hz
-  delay_wait_done.setMillis(1000);
+  delay_ros_error_.setMillis(200);  // must receive at least 5 Hz 
+  delay_board_okay_.setMillis(100);  // must receive at least 10 Hz
+  delay_wait_done_.setMillis(1000);
 }
 
-BaseState* WaitState::executeLoop(IControl* control)
+std::string WaitState::getName()
+{
+  return std::string{"WaitState"};
+}
+
+BaseState* WaitState::executeLoop(IControl* p_control)
 {
   BaseState* next_state = static_cast<BaseState*>(this);
-  if (!control->processDataFromRos())
+  const bool send_position = true;
+  const bool torque_enable = false;
+  if (!p_control->processDataFromRos())
   {
-    delay_ros_error.reset();
+    delay_ros_error_.reset();
   }
-  if (control->transferBoard())
+  if(!p_control->transferBoard(send_position, torque_enable))
   {
-    delay_board_okay.reset();
+    delay_board_okay_.reset();
   }
-  if (!delay_ros_error.isTimeout() && !delay_board_okay.isTimeout() && delay_wait_done.isTimeout())
+  if (!delay_ros_error_.isTimeout() && !delay_board_okay_.isTimeout() && delay_wait_done_.isTimeout())
   {
-    next_state = new SyncState;
+    next_state = static_cast<BaseState*>(new SyncState{});
   }
   return next_state;
   
@@ -37,19 +44,7 @@ BaseState* WaitState::executeLoop(IControl* control)
 
 void WaitState::enterState(IControl* control)
 {
-  delay_ros_error.reset();
-  delay_board_okay.reset();
-  delay_wait_done.reset();
-
-  control->setSrvIosWrite(false);
-  control->setSrvMotorCommand(false);
-  control->setSrvTorqueControlCommand(false);
-  control->setSrvResetCommand(false);
-  control->setPeriodicControl(false);
-
-  control->setSafeStateIos();
-}
-
-void WaitState::exitState(IControl* control)
-{
+  delay_ros_error_.reset();
+  delay_board_okay_.reset();
+  delay_wait_done_.reset();
 }

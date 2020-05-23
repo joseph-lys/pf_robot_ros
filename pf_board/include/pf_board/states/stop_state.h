@@ -17,11 +17,11 @@ class StopState : public BaseState
 {
  public:
   explicit StopState(uint32_t auto_start_ms=0);
- private:
+  std::string getName() override;
   BaseState* executeLoop(IControl*) override;
+  BaseState* executeTorqueControl(IControl*, bool torque_enable, uint32_t duration);
   void enterState(IControl*) override;
-  void exitState(IControl*) override;
-
+ private:
   bool has_auto_transition_;
   pf_board::SimpleTimer delay_auto_transition_;
   pf_board::SimpleTimer delay_board_error_;

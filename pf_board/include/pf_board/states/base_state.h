@@ -4,6 +4,7 @@
 #ifndef PF_BOARD_STATES_BASE_STATE_H
 #define PF_BOARD_STATES_BASE_STATE_H
 
+#include <string>
 #include "pf_board/states/icontrol.h"
 
 namespace pf_board
@@ -17,11 +18,33 @@ class BaseState
  public:
   virtual ~BaseState() = default;
 
-  virtual BaseState* executeLoop(IControl*) = 0;
+  virtual std::string getName() = 0;
 
-  virtual void enterState(IControl*) = 0;
+  virtual BaseState* executeLoop(IControl*)
+  {
+    return this;
+  }
 
-  virtual void exitState(IControl*) = 0;
+  virtual BaseState* executeTorqueControl(IControl* p_control, bool torque_enable, uint32_t duration)
+  { 
+    return this;
+  }
+
+  virtual BaseState* executeResetCommand(IControl* p_control)
+  {
+    return this;
+  }
+
+  virtual void enterState(IControl*)
+  {
+    return;
+  }
+
+  virtual void exitState(IControl*)
+  {
+    return;
+  }
+
 };
 
 

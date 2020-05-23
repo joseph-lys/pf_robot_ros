@@ -25,51 +25,16 @@ class IControl
   virtual bool processDataFromRos() = 0;
 
   /// trigger sending data exchange with board
+  /// @param send_position will send command to update motor position if true
+  /// @param torque_enable enable torque on motor if true, otherwise disable torque
   /// @return true if data was received from board, false otherwise
-  virtual bool transferBoard() = 0;
+  virtual bool transferBoard(bool send_position, bool torque_enable) = 0;
 
   /// process board data
   virtual void processDataFromBoard() = 0;
 
   /// trigger publishing of ros data
   virtual void transferDataToRos() = 0;
-
-  ///////////////////////////////////////////////////////////////
-  /// State Manipulation Functions
-  ///////////////////////////////////////////////////////////////  
-
-  /// set the torque enabled
-  /// @param enabled true will enable the torque on the motors
-  /// false will disable the torque on the motors
-  virtual void setTorqueEnabled(bool enabled) = 0;
-
-  /// set all outputs to safestate
-  virtual void setSafeStateIos() = 0;
-
-  ///////////////////////////////////////////////////////////////
-  /// Service Configuration Functions
-  ///////////////////////////////////////////////////////////////  
-
-  /// set IO Write service availability
-  /// @param availiable true to allow this service, false otherwise.
-  virtual void setSrvIosWrite(bool availiable) = 0;
-
-  /// set Motor Command service availability
-  /// @param availiable true to allow this service, false otherwise.
-  virtual void setSrvMotorCommand(bool availiable) = 0;
-
-  /// set Motor Torque Control Command service availability
-  /// this service allows enabling/disable motor torque
-  /// @param availiable true to allow this service, false otherwise.
-  virtual void setSrvTorqueControlCommand(bool availiable) = 0;
-
-  /// set Reset Command service availability
-  /// @param availiable true to allow this service, false otherwise.
-  virtual void setSrvResetCommand(bool availiable) = 0;
-
-  /// set Period Control action
-  /// @param enable true to enable periodic control, false otherwise.
-  virtual void setPeriodicControl(bool enable) = 0;
 };
 
 

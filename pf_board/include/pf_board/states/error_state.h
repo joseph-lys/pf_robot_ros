@@ -5,6 +5,7 @@
 #define PF_BOARD_STATES_ERROR_STATE_H
 
 #include "pf_board/states/base_state.h"
+#include "pf_board/states/stop_state.h"
 #include "pf_board/simple_timer.h"
 
 namespace pf_board
@@ -16,10 +17,9 @@ namespace states
 class ErrorState : public BaseState
 {
  public:
-  ErrorState();
+  std::string getName() override;
   BaseState* executeLoop(IControl*) override;
-  void enterState(IControl*) override;
-  void exitState(IControl*) override;
+  BaseState* executeResetCommand(IControl*) override;
 };
 
 

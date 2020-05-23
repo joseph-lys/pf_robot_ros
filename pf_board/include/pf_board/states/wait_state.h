@@ -18,13 +18,13 @@ class WaitState : private BaseState
 {
  public:
   WaitState();
+  std::string getName() override;
   BaseState* executeLoop(IControl*) override;
   void enterState(IControl*) override;
-  void exitState(IControl*) override;
  private:
-  pf_board::SimpleTimer delay_ros_error;
-  pf_board::SimpleTimer delay_board_okay;
-  pf_board::SimpleTimer delay_wait_done;
+  pf_board::SimpleTimer delay_ros_error_;
+  pf_board::SimpleTimer delay_board_okay_;
+  pf_board::SimpleTimer delay_wait_done_;
 };
 
 

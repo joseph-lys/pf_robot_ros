@@ -5,33 +5,21 @@ using pf_board::states::BaseState;
 using pf_board::states::NonRecoverableState;
 using pf_board::states::IControl;
 
-NonRecoverableState::NonRecoverableState()
+
+std::string NonRecoverableState::getName()
 {
+  return std::string{"NonRecoverableState"};
 }
 
-BaseState* NonRecoverableState::executeLoop(IControl* control)
+BaseState* NonRecoverableState::executeLoop(IControl* p_control)
 {
   BaseState* next_state = static_cast<BaseState*>(this);
-  control->processDataFromRos();
-  if (control->transferBoard())
+  const bool send_position = false;
+  const bool torque_enable = false;
+  p_control->processDataFromRos();
+  if (p_control->transferBoard(send_position, torque_enable))
   {
-    control->processDataFromBoard();
-    control->transferDataToRos();
+    p_control->processDataFromBoard();
   }
-}
-
-void NonRecoverableState::enterState(IControl* control)
-{
-  control->setSrvIosWrite(false);
-  control->setSrvMotorCommand(false);
-  control->setSrvTorqueControlCommand(false);
-  control->setPeriodicControl(false);
-  control->setSrvResetCommand(false);
-
-  control->setSafeStateIos();
-  control->setTorqueEnabled(false);
-}
-
-void NonRecoverableState::exitState(IControl* control)
-{
+  p_control->transferDataToRos();
 }

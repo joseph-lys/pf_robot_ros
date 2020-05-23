@@ -18,13 +18,13 @@ class SyncState : public BaseState
 {
  public:
   SyncState();
+  std::string getName() override;
   BaseState* executeLoop(IControl*) override;
   void enterState(IControl*) override;
-  void exitState(IControl*) override;
  private:
-  pf_board::SimpleTimer delay_ros_error;
-  pf_board::SimpleTimer delay_board_error;
-  pf_board::SimpleTimer delay_sync_done;
+  pf_board::SimpleTimer delay_ros_error_;
+  pf_board::SimpleTimer delay_board_error_;
+  pf_board::SimpleTimer delay_sync_done_;
 };
 
 

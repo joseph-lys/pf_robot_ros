@@ -13,52 +13,46 @@ using pf_board::states::IControl;
 
 SyncState::SyncState()
 {
-  delay_ros_error.setMillis(200);
-  delay_board_error.setMillis(100);
-  delay_sync_done.setMillis(5000);
+  delay_ros_error_.setMillis(200);
+  delay_board_error_.setMillis(100);
+  delay_sync_done_.setMillis(5000);
 }
 
-BaseState* SyncState::executeLoop(IControl* control)
+std::string SyncState::getName()
+{
+  return std::string{"SyncState"};
+}
+
+BaseState* SyncState::executeLoop(IControl* p_control)
 {
   BaseState* next_state = static_cast<BaseState*>(this);
-  if (control->processDataFromRos())
+  const bool send_position = true;
+  const bool torque_enable = false;
+  if (p_control->processDataFromRos())
   {
-    delay_ros_error.reset();
+    delay_ros_error_.reset();
   }
-  
-  if (control->transferBoard())
+  if (p_control->transferBoard(send_position, torque_enable))
   {
-    delay_board_error.reset();
+    delay_board_error_.reset();
+    p_control->processDataFromBoard();
   }
-  control->processDataFromBoard();
-  control->transferDataToRos();
+  p_control->transferDataToRos();
 
-  if (delay_ros_error.isTimeout() || delay_board_error.isTimeout())
+  if (delay_ros_error_.isTimeout() || delay_board_error_.isTimeout())
   {
-    delay_sync_done.reset(); 
+    delay_sync_done_.reset(); 
   }
-  if (delay_sync_done.isTimeout())
+  if (delay_sync_done_.isTimeout())
   {
-    next_state = new StopState;
+    next_state = new StopState{};
   }
   return next_state;
 }
 
-void SyncState::enterState(IControl* control)
+void SyncState::enterState(IControl* p_control)
 {
-  delay_ros_error.reset();
-  delay_board_error.reset();
-  delay_sync_done.reset();
-
-  control->setSrvIosWrite(false);
-  control->setSrvMotorCommand(false);
-  control->setSrvTorqueControlCommand(false);
-  control->setSrvResetCommand(false);
-  control->setPeriodicControl(false);
-
-  control->setSafeStateIos();
-}
-
-void SyncState::exitState(IControl* control)
-{
+  delay_ros_error_.reset();
+  delay_board_error_.reset();
+  delay_sync_done_.reset();
 }

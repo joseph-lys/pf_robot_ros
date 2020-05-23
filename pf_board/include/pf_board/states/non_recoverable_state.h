@@ -17,10 +17,8 @@ namespace states
 class NonRecoverableState : public BaseState
 {
  public:
-  NonRecoverableState();
+  std::string getName() override;
   BaseState* executeLoop(IControl*) override;
-  void enterState(IControl*) override;
-  void exitState(IControl*) override;
 };
 
 

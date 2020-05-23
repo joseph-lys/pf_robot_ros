@@ -1,5 +1,5 @@
-#include "pf_board/states/stop_state.h"
 #include "pf_board/states/run_state.h"
+#include "pf_board/states/stop_state.h"
 #include "pf_board/states/error_state.h"
 
 
@@ -24,22 +24,27 @@ RunState::RunState(uint32_t auto_stop_ms)
   delay_board_error_.setMillis(100);
 }
 
-BaseState* RunState::executeLoop(IControl* control)
+std::string RunState::getName()
+{
+  return std::string{"RunState"};
+}
+
+BaseState* RunState::executeLoop(IControl* p_control)
 {
   BaseState* next_state = static_cast<BaseState*>(this);
-  bool has_board_data;
-  if (!control->processDataFromRos())
+  const bool send_position = true;
+  const bool torque_enable = true;
+  if (p_control->processDataFromRos())
   {
     delay_ros_error_.reset();
   }
-  has_board_data = control->transferBoard();
-  if (has_board_data)
+  if (p_control->transferBoard(send_position, torque_enable))
   {
     delay_board_error_.reset();
-    control->processDataFromBoard();
-    control->transferDataToRos();
+    p_control->processDataFromBoard();
+    p_control->transferDataToRos();
   }
-  
+
   if (delay_ros_error_.isTimeout() || delay_board_error_.isTimeout())
   {
     next_state = new ErrorState{};
@@ -51,21 +56,19 @@ BaseState* RunState::executeLoop(IControl* control)
   return next_state;
 }
 
-void RunState::enterState(IControl* control)
+BaseState* RunState::executeTorqueControl(IControl* p_control, bool torque_enable, uint32_t duration)
+{
+  BaseState* next = static_cast<BaseState*>(this);
+  if (!torque_enable)
+  {
+    next = new StopState{duration};
+  }
+  return next;
+}
+
+void RunState::enterState(IControl* p_control)
 {
   delay_board_error_.reset();
   delay_ros_error_.reset();
   delay_auto_transition_.reset();
-
-  control->setSrvIosWrite(true);
-  control->setSrvMotorCommand(true);
-  control->setSrvTorqueControlCommand(true);
-  control->setSrvResetCommand(false);
-  control->setPeriodicControl(true);
-
-  control->setTorqueEnabled(true);
-}
-
-void RunState::exitState(IControl* control)
-{
 }

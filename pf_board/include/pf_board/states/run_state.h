@@ -16,10 +16,11 @@ class RunState : public BaseState
 {
  public:
   explicit RunState(uint32_t auto_stop_ms=0);
+  std::string getName() override;
  private:
   BaseState* executeLoop(IControl*) override;
+  BaseState* executeTorqueControl(IControl* p_control, bool torque_enable, uint32_t duration) override;
   void enterState(IControl*) override;
-  void exitState(IControl*) override;
 
   bool has_auto_transition_;
   pf_board::SimpleTimer delay_auto_transition_;

@@ -1,38 +1,31 @@
 #include "pf_board/states/error_state.h"
-
+#include "pf_board/states/stop_state.h"
 
 using pf_board::states::BaseState;
 using pf_board::states::ErrorState;
 using pf_board::states::IControl;
+using pf_board::states::StopState;
 
-ErrorState::ErrorState()
+
+std::string ErrorState::getName()
 {
+  return std::string{"ErrorState"};
 }
 
-BaseState* ErrorState::executeLoop(IControl* control)
+BaseState* ErrorState::executeLoop(IControl* p_control)
 {
   BaseState* next_state = static_cast<BaseState*>(this);
-  control->processDataFromRos();
-  if (control->transferBoard())
+  const bool send_position = true;
+  const bool torque_enable = false;
+  p_control->processDataFromRos();
+  if (p_control->transferBoard(send_position, torque_enable))
   {
-    control->processDataFromBoard();
-    control->transferDataToRos();
+    p_control->processDataFromBoard();
   }
-
+  p_control->transferDataToRos();
 }
 
-void ErrorState::enterState(IControl* control)
+BaseState* ErrorState::executeResetCommand(IControl* p_control)
 {
-  control->setSrvIosWrite(false);
-  control->setSrvMotorCommand(true);
-  control->setSrvTorqueControlCommand(false);
-  control->setPeriodicControl(false);
-  control->setSrvResetCommand(true);
-
-  control->setSafeStateIos();
-  control->setTorqueEnabled(false);
-}
-
-void ErrorState::exitState(IControl* control)
-{
+  return static_cast<BaseState*>(new StopState{});
 }
