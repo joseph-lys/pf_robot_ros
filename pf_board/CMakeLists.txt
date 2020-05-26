@@ -12,8 +12,11 @@ find_package(catkin REQUIRED
   COMPONENTS
     roscpp
     sensor_msgs
+    control_msgs
     roslint
     pf_msgs
+    hardware_interface
+    controller_manager
 )
 
 ## Find system libraries
@@ -38,7 +41,10 @@ catkin_package(
   CATKIN_DEPENDS
     roscpp
     sensor_msgs
+    control_msgs
     pf_msgs
+    hardware_interface
+    controller_manager
 #  DEPENDS
 #    Boost
 )
@@ -54,9 +60,9 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
+  include/external/vstruct/include
+  include/external/generated
   ${catkin_INCLUDE_DIRS}
-#  ${EIGEN3_INCLUDE_DIR}
-#  ${Boost_INCLUDE_DIRS}
 )
 
 ## Declare cpp executables
@@ -72,6 +78,7 @@ add_executable(${PROJECT_NAME}
   src/pf_board/pf_board.cpp
   src/pf_board/simple_timer.cpp
   src/pf_board/time_source.cpp
+  src/pf_board/pf_board_control.cpp
   src/pf_board_node.cpp
 )
 ## cmd to find

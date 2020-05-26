@@ -13,6 +13,10 @@
 #include "sensor_msgs/JointState.h"
 #include "std_srvs/Trigger.h"
 #include "std_srvs/SetBool.h"
+#include "pf_board/states/state_machine.h"
+#include "pf_board/comms/spi_driver.h"
+#include "pf_board/pf_board_control.h"
+
 
 namespace pf_board
 {
@@ -23,15 +27,13 @@ class PfBoard
   explicit PfBoard(ros::NodeHandle& nodeHandle);
   ~PfBoard();
   bool init();
-  void runLoop();
+  void executeOnce();
 
   /// Service Callbacks
   bool motorTorqueSrvCallback(std_srvs::SetBool::Request& request, std_srvs::SetBool::Response& response);
   bool resetSrvCallback(std_srvs::Trigger::Request& request, std_srvs::Trigger::Response& response);
  private:
   ros::NodeHandle& nodeHandle_;
-  std::string param_motor_mapping_topic_;
-  std::string subscriber_joint_jog_topic_;
 
   ros::Subscriber sub_joint_jog_;
   ros::Publisher pub_joint_state_;
@@ -41,6 +43,11 @@ class PfBoard
   std::vector<int> motor_id_list_;
   std::unordered_map<int, size_t> motor_id_to_index_;
   std::unordered_map<std::string, size_t> joint_name_to_index_;
+
+  pf_board::PfBoardControl control_;
+  pf_board::states::StateMachine state_machine_;
+
+  bool initBoardComms(std::string dev_path);
 };
 
 

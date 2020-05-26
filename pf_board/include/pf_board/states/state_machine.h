@@ -18,7 +18,7 @@ class StateMachine
 {
  public:
   ~StateMachine();
-  void setControl(pf_board::states::IControl* p_contol)
+  void setControl(pf_board::states::IControl* p_contol);
   bool srvTorqueControl(bool torque_enabled);
   bool srvResetCommand();
   void executeLoop();

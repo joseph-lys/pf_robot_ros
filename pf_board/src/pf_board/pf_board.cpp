@@ -20,8 +20,10 @@ PfBoard::~PfBoard()
 bool PfBoard::init()
 {
   bool success = false;
+  std::string subscriber_joint_jog_topic;
+  std::string driver_dev_path;
 
-  if (!nodeHandle_.getParam("subscriber_topic", subscriber_joint_jog_topic_))
+  if (!nodeHandle_.getParam("subscriber_topic", subscriber_joint_jog_topic))
   {
     ROS_ERROR("no param named 'subscriber_topic'");
   }
@@ -33,32 +35,26 @@ bool PfBoard::init()
   {
     ROS_ERROR("no param named 'motor_ids'");
   }
-  else if ((joint_name_list_.size() != motor_id_list_.size())
-           || (joint_name_list_.size() < 1))
+  else if (!nodeHandle_.getParam("driver_dev_path", driver_dev_path))
   {
-    ROS_ERROR("invalid size for param 'joint_names' and 'motor_ids'");
+    ROS_ERROR("no param named 'driver_dev_path'");
+  }
+  else if (!initBoardComms(driver_dev_path))
+  {
+    ROS_ERROR("Failed to initialize communication to Board");
   }
   else
   {
+    state_machine_.setControl(&control_);
     pub_joint_state_ = nodeHandle_.advertise<sensor_msgs::JointState>("joint_state", 1);
     pub_motor_state_ = nodeHandle_.advertise<pf_msgs::MotorStateArray>("motor_state", 1);
     pub_foot_sensor_ = nodeHandle_.advertise<pf_msgs::FootSensorArray>("foot_sensor", 1);
     success = true;
+    ROS_INFO("Successfully launched node.");
   }
-  
   return success;
 }
-//   if (!readParameters())
-//   {
-//     ROS_ERROR("Could not read parameters.");
-//     ros::requestShutdown();
-//   }
-//   // subscriber_ = nodeHandle_.subscribe(subscriber_topic_, 1,
-//   //                                     &RosPackageTemplate::topicCallback, this);
-//   // serviceServer_ = nodeHandle_.advertiseService("get_average",
-//   //                                               &RosPackageTemplate::serviceCallback, this);
-//   ROS_INFO("Successfully launched node.");
-// }
+
 
 
 // bool PfBoard::readParameters()

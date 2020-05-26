@@ -27,6 +27,11 @@
 *.out
 *.app
 
+# Python
+*.pyc
+*.pyd
+__pycache__
+
 # Eclipse
 .cproject
 .project
