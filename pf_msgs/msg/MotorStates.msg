@@ -6,8 +6,12 @@ uint8 ERROR_CHECKSUM = 16
 uint8 ERROR_OVERLOAD = 32
 uint8 ERROR_INSTRUCTION = 64
 uint8 ERROR_COMMUNICATION = 128
-uint8 STATUS_TORQUE_ENABLED = 1
 
-uint8 id
-uint8 error
-uint8 status
+Header header
+bool comm_ok
+bool torque_enabled
+bool control_enabled
+string[] joint_names
+uint8[] motor_ids
+uint8[] motor_states
+

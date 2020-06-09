@@ -27,7 +27,7 @@
 /// [109].0             : pad3 (padding[0])
 struct CommandStruct : public vstruct::VStruct {
   /// motor is enabled
-  typename vstruct::BoolItem<decltype(vstruct::Root)>::type enabled{*this};
+  typename vstruct::BoolItem<vstruct::Root>::type enabled{*this};
   
   /// number of motors
   typename vstruct::LEItem<decltype(enabled), uint8_t, 6>::type size{*this};

@@ -7,8 +7,8 @@
 /// 
 /// 
 /// 
-#ifndef FEEBACK_STUCT_H_
-#define FEEBACK_STUCT_H_
+#ifndef FEEDBACK_STRUCT_H_
+#define FEEDBACK_STRUCT_H_
 #include "vstruct.h"
 
 
@@ -69,5 +69,5 @@ struct FeedbackStruct : public vstruct::VStruct {
 
 
 
-#endif  // FEEBACK_STUCT_H_
+#endif  // FEEDBACK_STRUCT_H_
 

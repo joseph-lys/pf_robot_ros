@@ -61,7 +61,7 @@ catkin_package(
 include_directories(
   include
   include/external/vstruct/include
-  include/external/generated
+  include/external/vstruct/generated
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -78,7 +78,7 @@ add_executable(${PROJECT_NAME}
   src/pf_board/pf_board.cpp
   src/pf_board/simple_timer.cpp
   src/pf_board/time_source.cpp
-  src/pf_board/pf_board_control.cpp
+  src/pf_board/hardware_interface.cpp
   src/pf_board_node.cpp
 )
 ## cmd to find

@@ -62,8 +62,8 @@ class TransportLayer
   /// @param source_buffer source location to begin reading data
   /// @param max_buffer_size maximum size of the buffer
   /// @param allowed_types white list of allowed TypeEnums, fails to read if any does not match
-  /// @returns TypeInfo of first struct at index 0 if successful, otherwise returns an invalid TypeInfo
-  TypeInfo beginRead(uint8_t* source_buffer, size_t max_buffer_size=256, uint8_t allowed_types=0xff);
+  /// @returns number of valid structs
+  std::size_t beginRead(uint8_t* source_buffer, std::size_t max_buffer_size=256, uint8_t allowed_types=0xff);
 
   /// Retrieve current struct typeinfo
   TypeInfo currentRead();
@@ -82,7 +82,7 @@ class TransportLayer
   /// Start Writing to target buffer
   /// @param target_buffer target location to begin writing data
   /// @param max_buffer_size maximum size of the buffer
-  void beginWrite(uint8_t* target_buffer, size_t max_buffer_size=256);
+  void beginWrite(uint8_t* target_buffer, std::size_t max_buffer_size=256);
 
   /// Resets to the initial write state
   /// This reuses previous write buffer pointer
@@ -92,27 +92,27 @@ class TransportLayer
   /// @param len number of bytes to allocate
   /// @param type_enum see TypeEnum field
   /// @returns pointer to the first allocated byte, returns nullptr if failed to allocate
-  uint8_t* allocateWrite(uint8_t len, TypeEnum type_enum=0);
+  uint8_t* allocateWrite(uint8_t len, TypeEnum type_enum);
 
   /// Allocate N bytes of data to be written, and copy from a source buffer
   /// @param source_data pointer to source data to copy from
   /// @param len number of bytes to allocate
   /// @param type_enum see TypeEnum field
   /// @returns true if successful, false otherwise
-  bool allocateWriteFrom(uint8_t* source_data, uint8_t len, TypeEnum type_enum=0);
+  bool allocateWriteFrom(uint8_t* source_data, uint8_t len, TypeEnum type_enum);
 
   /// Finalize all data, calculate number 
   /// @returns total number of written bytes including headers and checksum
-  size_t finalizeWrite();
+  std::size_t finalizeWrite();
 
  private:
   bool readable_ = false;
   bool writable_ = false;
   uint8_t struct_index_ = 0;
-  size_t byte_index_ = 0;
-  size_t max_struct_index_ = 0;
+  std::size_t byte_index_ = 0;
+  std::size_t max_struct_index_ = 0;
   uint8_t* buf_ = nullptr;
-  size_t max_buffer_size_ = 0;
+  std::size_t max_buffer_size_ = 0;
 };
 
 

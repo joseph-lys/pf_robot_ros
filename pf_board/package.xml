@@ -16,8 +16,8 @@
   <depend>sensor_msgs</depend>
   <depend>control_msgs</depend>
   <depend>pf_msgs</depend>
-  <build_depend>hardware_interface</build_depend>
-  <build_depend>combined_robot_hw</build_depend>
-  <build_depend>controller_manager</build_depend>
+  <depend>hardware_interface</depend>
+  <depend>combined_robot_hw</depend>
+  <depend>controller_manager</depend>
   <build_depend>roslint</build_depend>
 </package>

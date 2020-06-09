@@ -4,6 +4,7 @@
 #include "pf_board/comms/transport_layer.h"
 #include <string.h>
 
+
 using pf_board::comms::TransportLayer;
 using pf_board::comms::TypeInfo;
 
@@ -29,7 +30,7 @@ static unsigned char const crc8x_table[] = {
     0x1a, 0x2b, 0xbc, 0x8d, 0xde, 0xef, 0x82, 0xb3, 0xe0, 0xd1, 0x46, 0x77, 0x24,
     0x15, 0x3b, 0x0a, 0x59, 0x68, 0xff, 0xce, 0x9d, 0xac};
 
-static uint8_t calculateCRC8(uint8_t* buffer, size_t length)
+static uint8_t calculateCRC8(uint8_t* buffer, std::size_t length)
 {
   /// https://stackoverflow.com/questions/51752284/how-to-calculate-crc8-in-c
   uint8_t crc = 0xff;
@@ -41,14 +42,14 @@ static uint8_t calculateCRC8(uint8_t* buffer, size_t length)
   return crc;
 }
 
-static uint16_t calculateCRC16(uint8_t* buffer, size_t length)
+static uint16_t calculateCRC16(uint8_t* buffer, std::size_t length)
 {
   /// Todo: just return some value for now
   return 0xAABB;
 }
 
 
-TypeInfo TransportLayer::beginRead(uint8_t* buffer_source, size_t max_buffer_size, uint8_t allowed_types)
+std::size_t TransportLayer::beginRead(uint8_t* buffer_source, std::size_t max_buffer_size, uint8_t allowed_types)
 {
   byte_index_ = 0;
   struct_index_ = 0;
@@ -57,8 +58,9 @@ TypeInfo TransportLayer::beginRead(uint8_t* buffer_source, size_t max_buffer_siz
   readable_ = false;
   uint8_t x, crc8, temp_struct_index, temp_max_struct_index;
   uint16_t y, crc16;
-  size_t temp_byte_index;
-  TypeInfo t{};
+  std::size_t temp_byte_index;
+
+  max_struct_index_ = 0;
 
   if (buffer_source == nullptr)
   {
@@ -74,6 +76,7 @@ TypeInfo TransportLayer::beginRead(uint8_t* buffer_source, size_t max_buffer_siz
   }
   else
   {
+    // check each data header
     temp_max_struct_index = buffer_source[0];
     temp_struct_index = 0;
     temp_byte_index = 2ULL;
@@ -81,7 +84,7 @@ TypeInfo TransportLayer::beginRead(uint8_t* buffer_source, size_t max_buffer_siz
     for (temp_struct_index = 0; temp_struct_index<temp_max_struct_index; temp_max_struct_index++)
     {
       x = buffer_source[temp_byte_index];
-      if (temp_byte_index + 3ULL + static_cast<size_t>(x) > max_buffer_size)
+      if (temp_byte_index + 3ULL + static_cast<std::size_t>(x) > max_buffer_size)
       {
         /// out of bound condition
         success = false;
@@ -102,9 +105,9 @@ TypeInfo TransportLayer::beginRead(uint8_t* buffer_source, size_t max_buffer_siz
       }
       // move the byte position of the next struct.
       // if this is the last struct, the updated index will represent the length
-      temp_byte_index += 3ULL + static_cast<size_t>(x);
+      temp_byte_index += 3ULL + static_cast<std::size_t>(x);
     }
-    if (temp_byte_index + 2ULL> max_buffer_size))
+    if (temp_byte_index + 2ULL> max_buffer_size)
     {
       // not possible, crc16 is out of bound!
     }
@@ -117,16 +120,14 @@ TypeInfo TransportLayer::beginRead(uint8_t* buffer_source, size_t max_buffer_siz
       {
         // all ok, can initialize the read data
         max_struct_index_ = temp_max_struct_index;
-        byte_index_ = 2ULL;
+        byte_index_ = 0U;
         struct_index_ = 0U;
-        buf_ = buffer_source;
+        buf_ = &buffer_source[0];
         readable_ = true;
-
-        t = currentRead();
       }
     }
   }
-  return t;
+  return max_struct_index_;
 }
 
 TypeInfo TransportLayer::currentRead()
@@ -134,9 +135,12 @@ TypeInfo TransportLayer::currentRead()
   TypeInfo t{};
   if (readable_)
   {
-    t.data_ptr = &buf_[byte_index_ + 3];
-    t.data_len = buf_[byte_index_];
-    t.type_enum = buf_[byte_index_ + 1];
+    if(byte_index_ > 0)
+    {
+      t.data_ptr = &buf_[byte_index_ + 3];
+      t.data_len = buf_[byte_index_];
+      t.type_enum = buf_[byte_index_ + 1];
+    }
   }
   return t;
 }
@@ -148,9 +152,16 @@ TypeInfo TransportLayer::peekRead()
   {
     // error, check if previous call to beginRead(...) was successful!
   }
+  else if (byte_index_ == 0)
+  {
+    /// first data
+    t.data_ptr = &buf_[2 + 3];
+    t.data_len = buf_[2];
+    t.type_enum = buf_[3];
+  }
   else if (struct_index_ + 1 < max_struct_index_)
   {
-    size_t temp_index = byte_index_ + 3ULL + static_cast<size_t>(buf_[byte_index_]);
+    std::size_t temp_index = byte_index_ + 3ULL + static_cast<std::size_t>(buf_[byte_index_]);
     t.data_ptr = &buf_[temp_index + 3];
     t.data_len = buf_[temp_index];
     t.type_enum = buf_[temp_index + 1];
@@ -160,23 +171,26 @@ TypeInfo TransportLayer::peekRead()
 
 TypeInfo TransportLayer::nextRead()
 {
-  TypeInfo t = peek;
+  TypeInfo t = peekRead();
   if (t)
   {
-    byte_index_ += 3ULL + static_cast<size_t>(buf_[byte_index_]);
+    if(byte_index_ == 0)
+    {
+      byte_index_ = 2ULL;  // first struct
+    }
+    else
+    {
+      byte_index_ += 3ULL + static_cast<std::size_t>(buf_[byte_index_]);
+    }
+    struct_index_ += 1;
   }
   return t;
 }
 
-void TransportLayer::beginWrite(uint8_t* target_buffer, size_t max_buffer_size)
+void TransportLayer::beginWrite(uint8_t* target_buffer, std::size_t max_buffer_size)
 {
   buf_ = target_buffer;
   max_buffer_size_ = max_buffer_size;
-  clearWrite();
-}
-
-void TransportLayer::clearWrite()
-{
   readable_ = false;
   writable_ = false;
 
@@ -188,7 +202,7 @@ void TransportLayer::clearWrite()
   }
 }
 
-uint8_t* TransportLayer::allocateWrite(uint8_t len, TypeEnum type_enum=0)
+uint8_t* TransportLayer::allocateWrite(uint8_t len, TypeEnum type_enum)
 {
   uint8_t* ptr = nullptr;
   bool can_allocate = false;
@@ -207,7 +221,7 @@ uint8_t* TransportLayer::allocateWrite(uint8_t len, TypeEnum type_enum=0)
   else if (byte_index_ == 0) // first allocation!
   {
     // 7 bytes reserved for number of structs (2), struct header (3), and crc16(2)
-    if (byte_index_ + 7ULL + static_cast<size_t>(len) <= max_buffer_size_)
+    if (byte_index_ + 7ULL + static_cast<std::size_t>(len) <= max_buffer_size_)
     {
       struct_index_ = 0;
       byte_index_ = 2ULL;
@@ -218,13 +232,13 @@ uint8_t* TransportLayer::allocateWrite(uint8_t len, TypeEnum type_enum=0)
     }
   }
 
-  else if (byte_index_ > 0 && current_)  // already allocated, start on next 
+  else  // already allocated, start on next 
   {
     // 5 bytes reserved for struct header (3), and crc16(2)
-    if (byte_index_ + buf_[byte_index_] + 5ULL + static_cast<size_t>(len) <= max_buffer_size_)
+    if (byte_index_ + buf_[byte_index_] + 5ULL + static_cast<std::size_t>(len) <= max_buffer_size_)
     {
       struct_index_++;
-      byte_index_ += 3ULL + static_cast<size_t>(buf_[byte_index_]);
+      byte_index_ += 3ULL + static_cast<std::size_t>(buf_[byte_index_]);
       ptr = &buf_[byte_index_ + 3];
       buf_[byte_index_] = len;
       buf_[byte_index_ + 1] = static_cast<uint8_t>(type_enum);
@@ -237,22 +251,22 @@ uint8_t* TransportLayer::allocateWrite(uint8_t len, TypeEnum type_enum=0)
 bool TransportLayer::allocateWriteFrom(uint8_t* source_data, uint8_t len, TypeEnum type_enum)
 {
   bool success = false;
-  uint8_t* ptr = allocateWrite();  // all checking is already done in allocateWrite(...)
+  uint8_t* ptr = allocateWrite(len, type_enum);  // all checking is already done in allocateWrite(...)
   if (ptr != nullptr)
   {
     memcpy(
       reinterpret_cast<void*>(ptr),          // destination
       reinterpret_cast<void*>(source_data),  // source
-      static_cast<size_t>(len)               // num
+      static_cast<std::size_t>(len)               // num
     );
     success = true;
   }
   return success;
 }
 
-size_t finalizeWrite()
+std::size_t TransportLayer::finalizeWrite()
 {
-  size_t total_bytes = 0;
+  std::size_t total_bytes = 0;
   uint16_t crc16;
   if (buf_ == nullptr)
   {
@@ -262,7 +276,7 @@ size_t finalizeWrite()
   {
     // error, check if previous call to beginWrite(...) was successful!
   }
-  else if (byte_index_ == 0) // first allocation!
+  else if (byte_index_ == 0) // first allocation not done!
   {
     // error, finalized empty data!
   }
@@ -273,14 +287,13 @@ size_t finalizeWrite()
     buf_[1] = calculateCRC8(&buf_[0], 1);
 
     // increment the byte index, the byte_index_ now points to the CRC16;
-    byte_index_ += 3ULL + static_cast<size_t>(buf_[byte_index_]);
+    byte_index_ += 3ULL + static_cast<std::size_t>(buf_[byte_index_]);
     crc16 = calculateCRC16(&buf_[0], byte_index_);
     buf_[byte_index_] = static_cast<uint8_t>(crc16 & 0xff);
     buf_[byte_index_ + 1] = static_cast<uint8_t>(crc16 >> 8);
     
-    byte_index_ += 2ULL;  // represent the total number of bytes including crc
     writable_ = false;
-    total_bytes = byte_index_;
+    total_bytes = byte_index_ + 2ULL;
   }
   return total_bytes;
 }
